@@ -1,0 +1,5 @@
+selenium
+chromedriver-binary
+numpy
+keyring
+rich
