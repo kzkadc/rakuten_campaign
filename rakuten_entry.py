@@ -20,27 +20,17 @@ def main():
 
     driver = webdriver.Chrome()
 
+    login(driver, cred)
+    wait_random_time(0.0, 4.0, 1.0)
+
     entry_campaigns(driver, cred)
 
-    # click point
-    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml?l-id=enavi_mtop_pointservice_click")
-    wait_random_time(3.0, 1.0, 1.0)
-
-    boxes = driver.find_elements(
-        By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")
-    num_boxes = len(boxes)
-    for i in range(num_boxes):
-        box = driver.find_elements(
-            By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i-1]
-        link: WebElement = box.find_element(By.CSS_SELECTOR, "a")
-        link.click()
-        wait_random_time(5.0, 1.0, 1.0)
-        driver.switch_to.window(driver.window_handles[0])
+    click_point(driver)
 
     driver.quit()
 
 
-def entry_campaigns(driver: WebDriver, cred: Credential):
+def login(driver: WebDriver, cred: Credential):
     driver.get(
         "https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml?l-id=enavi_all_glonavi_campaign")
     wait_random_time(3.0, 1.0, 1.0)
@@ -52,8 +42,8 @@ def entry_campaigns(driver: WebDriver, cred: Credential):
     elem.send_keys(cred.password)
     elem.submit()
 
-    wait_random_time(0.0, 4.0, 1.0)
 
+def entry_campaigns(driver: WebDriver, cred: Credential):
     elem = driver.find_element("id", "ongoingCampaign")
     campaign_ids: list[str] = elem.get_attribute(
         "data-campaign-codes").split(" ")
@@ -96,6 +86,23 @@ def entry_campaigns(driver: WebDriver, cred: Credential):
             entry_button.click()
             wait_random_time(5.0, 1.0, 1.0)
             print("applied!")
+
+
+def click_point(driver: WebDriver):
+    # click point
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml?l-id=enavi_mtop_pointservice_click")
+    wait_random_time(3.0, 1.0, 1.0)
+
+    boxes = driver.find_elements(
+        By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")
+    num_boxes = len(boxes)
+    for i in range(num_boxes):
+        box = driver.find_elements(
+            By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i-1]
+        link: WebElement = box.find_element(By.CSS_SELECTOR, "a")
+        link.click()
+        wait_random_time(5.0, 1.0, 1.0)
+        driver.switch_to.window(driver.window_handles[0])
 
 
 def wait_random_time(mean: float, std: float, least: float):
