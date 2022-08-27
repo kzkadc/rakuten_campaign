@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 import numpy as np
+from scipy.stats import truncnorm
 import keyring
 from keyring.credentials import Credential
 from rich import print
@@ -105,9 +106,9 @@ def click_point(driver: WebDriver):
         driver.switch_to.window(driver.window_handles[0])
 
 
-def wait_random_time(mean: float, std: float, least: float):
-    s = np.random.normal(mean, std)
-    time.sleep(np.maximum(s, least))
+def wait_random_time(loc: float, scale: float, least: float):
+    s = truncnorm.rvs(least, np.inf, loc, scale)
+    time.sleep(s)
 
 
 if __name__ == "__main__":
