@@ -24,7 +24,7 @@ def main():
     login(driver, cred)
     wait_random_time(0.0, 4.0, 1.0)
 
-    entry_campaigns(driver, cred)
+    entry_campaigns(driver)
 
     click_point(driver)
 
@@ -44,7 +44,7 @@ def login(driver: WebDriver, cred: Credential):
     elem.submit()
 
 
-def entry_campaigns(driver: WebDriver, cred: Credential):
+def entry_campaigns(driver: WebDriver):
     elem = driver.find_element("id", "ongoingCampaign")
     campaign_ids: list[str] = elem.get_attribute(
         "data-campaign-codes").split(" ")
