@@ -72,21 +72,35 @@ def entry_campaigns(driver: WebDriver):
 
             entry_button: Optional[WebElement] = None
             for button_id in ("entryForm:entry",  "entryForm:entryTeam"):
-                try:
-                    entry_button = driver.find_element(
-                        "id", button_id)
-                except NoSuchElementException:
+                entry_button = find_element(driver, By.ID, button_id)
+                if entry_button is None:
                     continue
-                break
+                else:
+                    break
+
+            if entry_button is None:
+                entry_button = find_element(
+                    driver,
+                    By.CSS_SELECTOR,
+                    ".user-friendly-campaign-entry-form-entry-button-area"
+                )
 
             if entry_button is None:
                 print(
                     f"*****{d['campaign_name']} is not entried but not applied.*****")
-                continue
+            else:
+                entry_button.click()
+                wait_random_time(5.0, 1.0, 1.0)
+                print("applied!")
 
-            entry_button.click()
-            wait_random_time(5.0, 1.0, 1.0)
-            print("applied!")
+
+def find_element(driver: WebDriver, by, val) -> WebElement | None:
+    try:
+        elem = driver.find_element(by, val)
+    except NoSuchElementException:
+        return None
+
+    return elem
 
 
 def click_point(driver: WebDriver):
