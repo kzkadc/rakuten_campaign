@@ -22,7 +22,7 @@ def main():
     driver = webdriver.Chrome()
 
     login(driver, cred)
-    wait_random_time(0.0, 4.0, 1.0)
+    wait_random_time(4.0, 2.0, 2.0)
 
     entry_campaigns(driver)
 
@@ -34,7 +34,7 @@ def main():
 def login(driver: WebDriver, cred: Credential):
     driver.get(
         "https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml?l-id=enavi_all_glonavi_campaign")
-    wait_random_time(3.0, 1.0, 1.0)
+    wait_random_time(4.0, 1.0, 2.0)
 
     # login
     elem: WebElement = driver.find_element("id", "u")
@@ -68,7 +68,7 @@ def entry_campaigns(driver: WebDriver):
         if d["entry_necessary"] and not d["applied"]:
             driver.get(
                 "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc="+d["cid"])
-            wait_random_time(5.0, 1.5, 1.0)
+            wait_random_time(5.0, 2.0, 3.0)
 
             entry_button: Optional[WebElement] = None
             for button_id in ("entryForm:entry",  "entryForm:entryTeam"):
@@ -90,7 +90,7 @@ def entry_campaigns(driver: WebDriver):
                     f"*****{d['campaign_name']} is not entried but not applied.*****")
             else:
                 entry_button.click()
-                wait_random_time(5.0, 1.0, 1.0)
+                wait_random_time(5.0, 2.0, 3.0)
                 print("applied!")
 
 
@@ -116,12 +116,13 @@ def click_point(driver: WebDriver):
             By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i-1]
         link: WebElement = box.find_element(By.CSS_SELECTOR, "a")
         link.click()
-        wait_random_time(5.0, 1.0, 1.0)
+        wait_random_time(5.0, 1.0, 3.0)
         driver.switch_to.window(driver.window_handles[0])
 
 
 def wait_random_time(loc: float, scale: float, least: float):
-    s = truncnorm.rvs(least, np.inf, loc, scale)
+    a = (least - loc) / scale
+    s = truncnorm.rvs(a, np.inf, loc, scale)
     time.sleep(s)
 
 
