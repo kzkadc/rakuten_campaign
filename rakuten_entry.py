@@ -1,4 +1,5 @@
 from typing import Optional
+import time
 
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -11,8 +12,6 @@ from scipy.stats import truncnorm
 import keyring
 from keyring.credentials import Credential
 from rich import print
-
-import time
 
 
 def main():
@@ -89,9 +88,14 @@ def entry_campaigns(driver: WebDriver):
                 print(
                     f"*****{d['campaign_name']} is not entried but not applied.*****")
             else:
-                entry_button.click()
+                try:
+                    entry_button.click()
+                except Exception as e:
+                    print(f"cannot entry: {e}")
+                else:
+                    print("applied!")
+
                 wait_random_time(5.0, 2.0, 3.0)
-                print("applied!")
 
 
 def find_element(driver: WebDriver, by, val) -> WebElement | None:
