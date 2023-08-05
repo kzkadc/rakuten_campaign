@@ -25,6 +25,8 @@ def main():
 
     entry_campaigns(driver)
 
+    entry_pointcard_campaign(driver)
+
     click_point(driver)
 
     driver.quit()
@@ -98,7 +100,57 @@ def entry_campaigns(driver: WebDriver):
                 wait_random_time(5.0, 2.0, 3.0)
 
 
-def find_element(driver: WebDriver, by, val) -> WebElement | None:
+def entry_pointcard_campaign(driver: WebDriver):
+    driver.get("https://pointcard.rakuten.co.jp/campaign/")
+
+    wait_random_time(5.0, 2.0, 3.0)
+
+    SCROLL_STEPS = 4
+    for i in range(1, SCROLL_STEPS + 1):
+        driver.execute_script(
+            f"window.scrollTo(0, document.body.scrollHeight*{i}/{SCROLL_STEPS});")
+        wait_random_time(2.0, 1.0, 1.0)
+
+    wait_random_time(5.0, 2.0, 3.0)
+
+    campaign_elems = driver.find_elements(
+        By.CSS_SELECTOR, "li.Campaign__root.Campaign__show")
+    campaign_info = []
+    for elem in campaign_elems:
+        details = elem.find_element(By.CSS_SELECTOR, ".Campaign__details")
+        name = details.find_element(By.CSS_SELECTOR, ".Campaign__title")
+        name = name.text.strip()
+
+        state = details.find_element(
+            By.CSS_SELECTOR, ".Badges__root")
+        state = state.text.strip()
+
+        url = elem.find_element(By.CSS_SELECTOR, "a.Campaign__contents") \
+            .get_attribute("href")
+
+        campaign_info.append((name, state, url))
+
+    for name, state, url in campaign_info:
+        print(f"{name}, {state}, {url}")
+        if any(w in state for w in ("エントリー不要", "エントリー済")):
+            print("-- skip")
+            continue
+
+        driver.get(url)
+        wait_random_time(5.0, 2.0, 3.0)
+        entry_button = find_element(driver, By.CSS_SELECTOR,
+                                    ".rex-entry-button__enabled a")
+        if entry_button is not None:
+            try:
+                entry_button.click()
+            except Exception as e:
+                print(f"-- could click entry button: {e}")
+            wait_random_time(5.0, 2.0, 3.0)
+        else:
+            print("-- could not find entry button")
+
+
+def find_element(driver: WebDriver, by: str, val: str) -> WebElement | None:
     try:
         elem = driver.find_element(by, val)
     except NoSuchElementException:
