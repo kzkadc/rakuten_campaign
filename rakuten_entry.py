@@ -164,8 +164,15 @@ def click_point(driver: WebDriver):
         By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")
     for i, _ in enumerate(boxes):
         box = driver.find_elements(
-            By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i - 1]
-        link = box.find_element(By.CSS_SELECTOR, "a")
+            By.CSS_SELECTOR, "div.topArea.clearfix")[-i - 1]
+
+        try:
+            box.find_element(By.CSS_SELECTOR, ".dateArrival img")
+        except NoSuchElementException:
+            print(f"continue: {i}")
+            continue
+
+        link = box.find_element(By.CSS_SELECTOR, ".bnrBoxInner a")
         link.click()
 
         wait_random_time(5.0, 1.0, 3.0)
