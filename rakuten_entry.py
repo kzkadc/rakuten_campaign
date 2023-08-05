@@ -140,7 +140,7 @@ def entry_pointcard_campaign(driver: WebDriver):
             try:
                 entry_button.click()
             except Exception as e:
-                print(f"-- could click entry button: {e}")
+                print(f"-- could not click entry button: {e}")
             wait_random_time(5.0, 2.0, 3.0)
         else:
             print("-- could not find entry button")
