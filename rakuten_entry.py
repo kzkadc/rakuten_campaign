@@ -1,4 +1,3 @@
-from typing import Optional
 import time
 
 from selenium import webdriver
@@ -11,7 +10,7 @@ import numpy as np
 from scipy.stats import truncnorm
 import keyring
 from keyring.credentials import Credential
-from rich import print
+from rich import print  # pylint: disable=W0622
 
 
 def main():
@@ -38,22 +37,21 @@ def login(driver: WebDriver, cred: Credential):
     wait_random_time(4.0, 1.0, 2.0)
 
     # login
-    elem: WebElement = driver.find_element("id", "u")
+    elem = driver.find_element(By.ID, "u")
     elem.send_keys(cred.username)
-    elem = driver.find_element("id", "p")
+    elem = driver.find_element(By.ID, "p")
     elem.send_keys(cred.password)
     elem.submit()
 
 
 def entry_campaigns(driver: WebDriver):
-    elem = driver.find_element("id", "ongoingCampaign")
-    campaign_ids: list[str] = elem.get_attribute(
-        "data-campaign-codes").split(" ")
+    elem = driver.find_element(By.ID, "ongoingCampaign")
+    campaign_ids = elem.get_attribute("data-campaign-codes").split(" ")
 
     # get campaign list
     campaign_info = []
     for cid in campaign_ids:
-        article: WebElement = driver.find_element("id", cid)
+        article = driver.find_element(By.ID, cid)
         campaign_info.append({
             "cid": cid,
             "entry_necessary": article.get_attribute(
@@ -68,21 +66,19 @@ def entry_campaigns(driver: WebDriver):
 
         if d["entry_necessary"] and not d["applied"]:
             driver.get(
-                "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc="+d["cid"])
+                "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + d["cid"])
             wait_random_time(5.0, 2.0, 3.0)
 
-            entry_button: Optional[WebElement] = None
-            for button_id in ("entryForm:entry",  "entryForm:entryTeam"):
+            entry_button: WebElement | None = None
+            for button_id in ("entryForm:entry", "entryForm:entryTeam"):
                 entry_button = find_element(driver, By.ID, button_id)
                 if entry_button is None:
                     continue
-                else:
-                    break
+                break
 
             if entry_button is None:
                 entry_button = find_element(
-                    driver,
-                    By.CSS_SELECTOR,
+                    driver, By.CSS_SELECTOR,
                     ".user-friendly-campaign-entry-form-entry-button-area"
                 )
 
@@ -166,12 +162,12 @@ def click_point(driver: WebDriver):
 
     boxes = driver.find_elements(
         By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")
-    num_boxes = len(boxes)
-    for i in range(num_boxes):
+    for i, _ in enumerate(boxes):
         box = driver.find_elements(
-            By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i-1]
-        link: WebElement = box.find_element(By.CSS_SELECTOR, "a")
+            By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")[-i - 1]
+        link = box.find_element(By.CSS_SELECTOR, "a")
         link.click()
+
         wait_random_time(5.0, 1.0, 3.0)
         driver.switch_to.window(driver.window_handles[0])
 
