@@ -145,6 +145,8 @@ def entry_pointcard_campaign(driver: WebDriver):
         else:
             print("-- could not find entry button")
 
+        print()
+
 
 def find_element(driver: WebDriver, by: str, val: str) -> WebElement | None:
     try:
