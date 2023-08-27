@@ -17,7 +17,9 @@ def main():
     cred = keyring.get_credential("rakuten", None)
     assert cred is not None, "credential information for rakuten is not registerd."
 
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    driver = webdriver.Chrome(options=options)
 
     login(driver, cred)
     wait_random_time(4.0, 2.0, 2.0)
@@ -69,7 +71,6 @@ def entry_campaigns(driver: WebDriver):
                 "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + d["cid"])
             wait_random_time(5.0, 2.0, 3.0)
 
-            entry_button: WebElement | None = None
             for button_id in ("entryForm:entry", "entryForm:entryTeam"):
                 entry_button = find_element(driver, By.ID, button_id)
                 if entry_button is None:
