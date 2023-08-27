@@ -28,6 +28,8 @@ def main():
 
     entry_pointcard_campaign(driver)
 
+    entry_pay_campaign(driver)
+
     click_point(driver)
 
     driver.quit()
@@ -95,6 +97,58 @@ def entry_campaigns(driver: WebDriver):
                     print("applied!")
 
                 wait_random_time(5.0, 2.0, 3.0)
+
+
+def entry_pay_campaign(driver: WebDriver):
+    driver.get("https://pay.rakuten.co.jp/campaign/")
+
+    wait_random_time(5.0, 2.0, 3.0)
+
+    campaign_list = driver.find_elements(
+        By.CSS_SELECTOR, ".rpay-cmp ul#js-cmp-view-list.r-cp-list a.active")
+
+    campaign_info = []
+    for cmp in campaign_list:
+        name = find_element(cmp, By.CSS_SELECTOR,
+                            ".r-cp-list-cont .r-cp-title")
+        if name is None:
+            continue
+
+        name = name.text.strip()
+        url = cmp.get_attribute("href").strip()
+        need_to_entry = find_element(
+            cmp, By.CSS_SELECTOR, ".r-cp-bnr-icon-no-need-to-enter") is None
+        campaign_info.append({
+            "name": name,
+            "url": url,
+            "need_to_entry": need_to_entry
+        })
+
+    wait_random_time(5.0, 2.0, 3.0)
+
+    for cmp in campaign_info:
+        print(cmp["name"])
+        if not cmp["need_to_entry"]:
+            print("-- no need to entry")
+            continue
+
+        driver.get(cmp["url"])
+
+        wait_random_time(5.0, 2.0, 3.0)
+
+        button = find_element(driver, By.CSS_SELECTOR,
+                              ":is(div.CampaignButton, div.user-friendly-campaign-entry-form-entry-button-area) a")
+        if button is None:
+            print("-- Could not find entry button")
+            continue
+
+        try:
+            driver.execute_script("arguments[0].click();", button)
+        except Exception as e:
+            print(f"-- Could not entry: {e}")
+            continue
+
+        wait_random_time(5.0, 2.0, 3.0)
 
 
 def entry_pointcard_campaign(driver: WebDriver):
