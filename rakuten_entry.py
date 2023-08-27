@@ -90,7 +90,8 @@ def entry_campaigns(driver: WebDriver):
                     f"*****{d['campaign_name']} is not entried but not applied.*****")
             else:
                 try:
-                    entry_button.click()
+                    driver.execute_script(
+                        "arguments[0].click();", entry_button)
                 except Exception as e:
                     print(f"cannot entry: {e}")
                 else:
@@ -193,7 +194,7 @@ def entry_pointcard_campaign(driver: WebDriver):
                                     ".rex-entry-button__enabled a")
         if entry_button is not None:
             try:
-                entry_button.click()
+                driver.execute_script("arguments[0].click();", entry_button)
             except Exception as e:
                 print(f"-- could not click entry button: {e}")
             wait_random_time(5.0, 2.0, 3.0)
@@ -201,15 +202,6 @@ def entry_pointcard_campaign(driver: WebDriver):
             print("-- could not find entry button")
 
         print()
-
-
-def find_element(driver: WebDriver, by: str, val: str) -> WebElement | None:
-    try:
-        elem = driver.find_element(by, val)
-    except NoSuchElementException:
-        return None
-
-    return elem
 
 
 def click_point(driver: WebDriver):
@@ -230,10 +222,20 @@ def click_point(driver: WebDriver):
             continue
 
         link = box.find_element(By.CSS_SELECTOR, ".bnrBoxInner a")
-        link.click()
+        driver.execute_script("arguments[0].click();", link)
 
         wait_random_time(5.0, 1.0, 3.0)
         driver.switch_to.window(driver.window_handles[0])
+
+
+def find_element(driver: WebDriver | WebElement,
+                 by: str, val: str) -> WebElement | None:
+    try:
+        elem = driver.find_element(by, val)
+    except NoSuchElementException:
+        return None
+
+    return elem
 
 
 def wait_random_time(loc: float, scale: float, least: float):
