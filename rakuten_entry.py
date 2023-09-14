@@ -50,7 +50,11 @@ def login(driver: WebDriver, cred: Credential):
 
 def entry_campaigns(driver: WebDriver):
     elem = driver.find_element(By.ID, "ongoingCampaign")
-    campaign_ids = elem.get_attribute("data-campaign-codes").split(" ")
+    campaign_ids = elem.get_attribute("data-campaign-codes")
+    if campaign_ids is None:
+        print("could not get campaign_ids")
+        return
+    campaign_ids = campaign_ids.split(" ")
 
     # get campaign list
     campaign_info = []
@@ -73,6 +77,7 @@ def entry_campaigns(driver: WebDriver):
                 "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + d["cid"])
             wait_random_time(5.0, 2.0, 3.0)
 
+            entry_button = None
             for button_id in ("entryForm:entry", "entryForm:entryTeam"):
                 entry_button = find_element(driver, By.ID, button_id)
                 if entry_button is None:
@@ -116,7 +121,11 @@ def entry_pay_campaign(driver: WebDriver):
             continue
 
         name = name.text.strip()
-        url = cmp.get_attribute("href").strip()
+        url = cmp.get_attribute("href")
+        if url is None:
+            continue
+
+        url = url.strip()
         need_to_entry = find_element(
             cmp, By.CSS_SELECTOR, ".r-cp-bnr-icon-no-need-to-enter") is None
         campaign_info.append({
@@ -126,6 +135,13 @@ def entry_pay_campaign(driver: WebDriver):
         })
 
     wait_random_time(5.0, 2.0, 3.0)
+
+    BUTTON_SELECTOR_PARENTS = (
+        "div.CampaignButton",
+        "div.user-friendly-campaign-entry-form-entry-button-area",
+        "div.rex-entry-button__enabled"
+    )
+    BUTTON_SELECTOR = f":is({','.join(BUTTON_SELECTOR_PARENTS)}) a"
 
     for cmp in campaign_info:
         print(cmp["name"])
@@ -138,7 +154,7 @@ def entry_pay_campaign(driver: WebDriver):
         wait_random_time(5.0, 2.0, 3.0)
 
         button = find_element(driver, By.CSS_SELECTOR,
-                              ":is(div.CampaignButton, div.user-friendly-campaign-entry-form-entry-button-area) a")
+                              BUTTON_SELECTOR)
         if button is None:
             print("-- Could not find entry button")
             continue
