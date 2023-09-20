@@ -24,6 +24,8 @@ def main():
     login(driver, cred)
     wait_random_time(4.0, 2.0, 2.0)
 
+    entry_point_plus(driver)
+
     entry_campaigns(driver)
 
     entry_pointcard_campaign(driver)
@@ -49,6 +51,10 @@ def login(driver: WebDriver, cred: Credential):
 
 
 def entry_campaigns(driver: WebDriver):
+    driver.get(
+        "https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml?l-id=enavi_all_glonavi_campaign")
+    wait_random_time(4.0, 1.0, 2.0)
+
     elem = driver.find_element(By.ID, "ongoingCampaign")
     campaign_ids = elem.get_attribute("data-campaign-codes")
     if campaign_ids is None:
@@ -103,6 +109,44 @@ def entry_campaigns(driver: WebDriver):
                     print("applied!")
 
                 wait_random_time(5.0, 2.0, 3.0)
+
+
+def entry_point_plus(driver: WebDriver):
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/shop-point/index.xhtml?l-id=enavi_oo_pointservice_xlo_sideguide")
+
+    wait_random_time(5.0, 2.0, 3.0)
+
+    components = driver.find_elements(
+        By.CSS_SELECTOR, "div[data-state=\"undone\"] a.xlo-mfp-btn-ajax.xlo-tab-store-item")
+
+    for c in components:
+        try:
+            driver.execute_script("arguments[0].click();", c)
+        except Exception as e:
+            print(f"-- could not click component: {e}")
+            continue
+
+        wait_random_time(5.0, 2.0, 3.0)
+
+        entry_button = find_element(
+            driver,
+            By.CSS_SELECTOR,
+            "div.mfp-container div#mfp .xlo-new-btn-primary.xlo-new-btn-pill.xlo-btn-primary--undone"
+        )
+        if entry_button is None:
+            print("could not find entry button")
+            continue
+
+        store_name = find_element(
+            driver, By.CSS_SELECTOR, "div.mfp-container div#mfp .xlo-new-mfp__store-name")
+        if store_name is None:
+            print("store name unrecognized")
+        else:
+            print(store_name.text.strip())
+
+        driver.execute_script("arguments[0].click();", entry_button)
+
+        wait_random_time(5.0, 2.0, 3.0)
 
 
 def entry_pay_campaign(driver: WebDriver):
