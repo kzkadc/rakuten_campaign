@@ -25,15 +25,15 @@ def main():
     login(driver, cred)
     wait_random_time(4.0, 2.0, 2.0)
 
-    entry_point_plus(driver)
-
-    entry_campaigns(driver)
-
-    entry_pointcard_campaign(driver)
-
-    entry_pay_campaign(driver)
-
-    click_point(driver)
+    entry_functions = (
+        entry_point_plus,
+        entry_campaigns,
+        entry_pointcard_campaign,
+        entry_pay_campaign,
+        click_point
+    )
+    for i in np.random.permutation(len(entry_functions)):
+        entry_functions[i](driver)
 
     driver.quit()
 
