@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 
 import numpy as np
 from scipy.stats import truncnorm
@@ -116,37 +117,43 @@ def entry_point_plus(driver: WebDriver):
 
     wait_random_time(5.0, 2.0, 3.0)
 
-    components = driver.find_elements(
-        By.CSS_SELECTOR, "div[data-state=\"undone\"] a.xlo-mfp-btn-ajax.xlo-tab-store-item")
-
-    for c in components:
-        try:
-            driver.execute_script("arguments[0].click();", c)
-        except Exception as e:
-            print(f"-- could not click component: {e}")
-            continue
-
+    card_select = driver.find_element(By.ID, "cardChangeForm:cards")
+    card_select = Select(card_select)
+    for card_index in range(len(card_select.options)):
+        card_select.select_by_index(card_index)
         wait_random_time(5.0, 2.0, 3.0)
 
-        entry_button = find_element(
-            driver,
-            By.CSS_SELECTOR,
-            "div.mfp-container div#mfp .xlo-new-btn-primary.xlo-new-btn-pill.xlo-btn-primary--undone"
-        )
-        if entry_button is None:
-            print("could not find entry button")
-            continue
+        components = driver.find_elements(
+            By.CSS_SELECTOR, "div[data-state=\"undone\"] a.xlo-mfp-btn-ajax.xlo-tab-store-item")
 
-        store_name = find_element(
-            driver, By.CSS_SELECTOR, "div.mfp-container div#mfp .xlo-new-mfp__store-name")
-        if store_name is None:
-            print("store name unrecognized")
-        else:
-            print(store_name.text.strip())
+        for c in components:
+            try:
+                driver.execute_script("arguments[0].click();", c)
+            except Exception as e:
+                print(f"-- could not click component: {e}")
+                continue
 
-        driver.execute_script("arguments[0].click();", entry_button)
+            wait_random_time(5.0, 2.0, 3.0)
 
-        wait_random_time(5.0, 2.0, 3.0)
+            entry_button = find_element(
+                driver,
+                By.CSS_SELECTOR,
+                "div.mfp-container div#mfp .xlo-new-btn-primary.xlo-new-btn-pill.xlo-btn-primary--undone"
+            )
+            if entry_button is None:
+                print("could not find entry button")
+                continue
+
+            store_name = find_element(
+                driver, By.CSS_SELECTOR, "div.mfp-container div#mfp .xlo-new-mfp__store-name")
+            if store_name is None:
+                print("store name unrecognized")
+            else:
+                print(store_name.text.strip())
+
+            driver.execute_script("arguments[0].click();", entry_button)
+
+            wait_random_time(5.0, 2.0, 3.0)
 
 
 def entry_pay_campaign(driver: WebDriver):
