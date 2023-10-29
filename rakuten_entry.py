@@ -273,23 +273,20 @@ def entry_pointcard_campaign(driver: WebDriver):
 
 def click_point(driver: WebDriver):
     # click point
-    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml?l-id=enavi_mtop_pointservice_click")
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml?l-id=enavi_top_info-personal_click-point")
     wait_random_time(3.0, 1.0, 1.0)
 
-    boxes = driver.find_elements(
-        By.CSS_SELECTOR, "div.topArea.clearfix div.bnrBoxInner")
-    for i, _ in enumerate(boxes):
-        box = driver.find_elements(
-            By.CSS_SELECTOR, "div.topArea.clearfix")[-i - 1]
+    try:
+        banners = driver.find_elements(
+            By.CSS_SELECTOR, "ul.click-point-banner-list li.click-point-banner a")
+    except NoSuchElementException:
+        print("No banners.")
+        return
 
-        try:
-            box.find_element(By.CSS_SELECTOR, ".dateArrival img")
-        except NoSuchElementException:
-            print(f"continue: {i}")
-            continue
+    print(f"Number of banners: {len(banners)}")
 
-        link = box.find_element(By.CSS_SELECTOR, ".bnrBoxInner a")
-        driver.execute_script("arguments[0].click();", link)
+    for b in banners:
+        driver.execute_script("arguments[0].click();", b)
 
         wait_random_time(5.0, 1.0, 3.0)
         driver.switch_to.window(driver.window_handles[0])
