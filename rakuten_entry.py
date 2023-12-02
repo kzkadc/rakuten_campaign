@@ -92,10 +92,16 @@ def entry_campaigns(driver: WebDriver):
                 break
 
             if entry_button is None:
-                entry_button = find_element(
-                    driver, By.CSS_SELECTOR,
-                    ".user-friendly-campaign-entry-form-entry-button-area"
+                ENTRY_BUTTON_PARENTS = (
+                    ".rex-entry-button__enabled",
+                    ".CampaignButton",
+                    ".user-friendly-campaign-entry-form-entry-button-area",
+                    ".applyBtnWrap"
                 )
+                ENTRY_BUTTON_SELECTOR = f":is({','.join(ENTRY_BUTTON_PARENTS)}) a"
+
+                entry_button = find_element(
+                    driver, By.CSS_SELECTOR, ENTRY_BUTTON_SELECTOR)
 
             if entry_button is None:
                 print(
@@ -249,6 +255,13 @@ def entry_pointcard_campaign(driver: WebDriver):
 
         campaign_info.append((name, state, url))
 
+    ENTRY_BUTTON_PARENTS = (
+        ".rex-entry-button__enabled",
+        ".CampaignButton",
+        ".user-friendly-campaign-entry-form-entry-button-area"
+    )
+    ENTRY_BUTTON_SELECTOR = f":is({','.join(ENTRY_BUTTON_PARENTS)}) a"
+
     for name, state, url in campaign_info:
         print(f"{name}, {state}, {url}")
         if any(w in state for w in ("エントリー不要", "エントリー済")):
@@ -258,7 +271,7 @@ def entry_pointcard_campaign(driver: WebDriver):
         driver.get(url)
         wait_random_time(5.0, 2.0, 3.0)
         entry_button = find_element(driver, By.CSS_SELECTOR,
-                                    ".rex-entry-button__enabled a")
+                                    ENTRY_BUTTON_SELECTOR)
         if entry_button is not None:
             try:
                 driver.execute_script("arguments[0].click();", entry_button)
