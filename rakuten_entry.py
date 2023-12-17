@@ -299,6 +299,16 @@ def click_point(driver: WebDriver):
     print(f"Number of banners: {len(banners)}")
 
     for b in banners:
+        banner_img = b.find_element(
+            By.CSS_SELECTOR, ".click-point-banner-image-wrap img")
+        banner_alt = banner_img.get_attribute("alt")
+        print(banner_alt)
+
+        clicked_status = b.find_element(
+            By.CSS_SELECTOR, ".click-point-banner-clicked-item")
+        if clicked_status.text.strip() == "済":
+            continue
+
         driver.execute_script("arguments[0].click();", b)
 
         wait_random_time(5.0, 1.0, 3.0)
