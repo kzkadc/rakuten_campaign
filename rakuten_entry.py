@@ -1,4 +1,5 @@
 import time
+import json
 
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -56,66 +57,57 @@ def entry_campaigns(driver: WebDriver):
         "https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml?l-id=enavi_all_glonavi_campaign")
     wait_random_time(4.0, 1.0, 2.0)
 
-    elem = driver.find_element(By.ID, "ongoingCampaign")
-    campaign_ids = elem.get_attribute("data-campaign-codes")
+    campaign_ids = driver.find_element(
+        By.CSS_SELECTOR, "#user-basic-info").get_attribute("value")
     if campaign_ids is None:
         print("could not get campaign_ids")
         return
-    campaign_ids = campaign_ids.split(" ")
 
-    # get campaign list
-    campaign_info = []
-    for cid in campaign_ids:
-        article = driver.find_element(By.ID, cid)
-        campaign_info.append({
-            "cid": cid,
-            "entry_necessary": article.get_attribute(
-                "data-entry-necessary") == "true",
-            "applied": article.get_attribute("data-applied-flag") == "true",
-            "campaign_name": article.get_attribute("data-campaign-name")
-        })
+    campaign_ids = json.loads(campaign_ids)
+    campaign_ids = campaign_ids["items"]["campaign_status"]["ongoing"]["unregistered"]
+    print("campaign_ids", campaign_ids)
 
     # entry each campaign
-    for d in campaign_info:
-        print(d)
+    for cid in campaign_ids:
+        print(cid)
 
-        if d["entry_necessary"] and not d["applied"]:
-            driver.get(
-                "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + d["cid"])
-            wait_random_time(5.0, 2.0, 3.0)
+        driver.get(
+            "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + cid)
+        wait_random_time(5.0, 2.0, 3.0)
 
-            entry_button = None
-            for button_id in ("entryForm:entry", "entryForm:entryTeam"):
-                entry_button = find_element(driver, By.ID, button_id)
-                if entry_button is None:
-                    continue
-                break
-
+        entry_button = None
+        for button_id in ("entryForm:entry", "entryForm:entryTeam"):
+            entry_button = find_element(driver, By.ID, button_id)
             if entry_button is None:
-                ENTRY_BUTTON_PARENTS = (
-                    ".rex-entry-button__enabled",
-                    ".CampaignButton",
-                    ".user-friendly-campaign-entry-form-entry-button-area",
-                    ".applyBtnWrap"
-                )
-                ENTRY_BUTTON_SELECTOR = f":is({','.join(ENTRY_BUTTON_PARENTS)}) a"
+                continue
+            break
 
-                entry_button = find_element(
-                    driver, By.CSS_SELECTOR, ENTRY_BUTTON_SELECTOR)
+        if entry_button is None:
+            ENTRY_BUTTON_PARENTS = (
+                ".rex-entry-button__enabled",
+                ".CampaignButton",
+                ".user-friendly-campaign-entry-form-entry-button-area",
+                ".applyBtnWrap"
+            )
+            ENTRY_BUTTON_SELECTOR = f":is({','.join(
+                ENTRY_BUTTON_PARENTS)}) a"
 
-            if entry_button is None:
-                print(
-                    f"*****{d['campaign_name']} is not entried but not applied.*****")
+            entry_button = find_element(
+                driver, By.CSS_SELECTOR, ENTRY_BUTTON_SELECTOR)
+
+        if entry_button is None:
+            print(
+                f"*****{cid} is not entried but not applied.*****")
+        else:
+            try:
+                driver.execute_script(
+                    "arguments[0].click();", entry_button)
+            except Exception as e:
+                print(f"cannot entry: {e}")
             else:
-                try:
-                    driver.execute_script(
-                        "arguments[0].click();", entry_button)
-                except Exception as e:
-                    print(f"cannot entry: {e}")
-                else:
-                    print("applied!")
+                print("applied!")
 
-                wait_random_time(5.0, 2.0, 3.0)
+            wait_random_time(5.0, 2.0, 3.0)
 
 
 def entry_point_plus(driver: WebDriver):
