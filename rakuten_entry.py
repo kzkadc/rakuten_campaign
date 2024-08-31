@@ -45,11 +45,19 @@ def login(driver: WebDriver, cred: Credential):
     wait_random_time(4.0, 1.0, 2.0)
 
     # login
-    elem = driver.find_element(By.ID, "u")
+    elem = driver.find_element(By.ID, "user_id")
     elem.send_keys(cred.username)
-    elem = driver.find_element(By.ID, "p")
+    wait_random_time(2.0, 1.0, 1.0)
+    button = driver.find_element(By.CSS_SELECTOR, "#cta001 > div > div")
+    driver.execute_script("arguments[0].click();", button)
+
+    wait_random_time(3.0, 1.0, 2.0)
+
+    elem = driver.find_element(By.ID, "password_current")
     elem.send_keys(cred.password)
-    elem.submit()
+    wait_random_time(2.0, 1.0, 1.0)
+    button = driver.find_element(By.CSS_SELECTOR, "#cta011 > div > div")
+    driver.execute_script("arguments[0].click();", button)
 
 
 def entry_campaigns(driver: WebDriver):
