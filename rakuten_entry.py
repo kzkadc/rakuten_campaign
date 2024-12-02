@@ -61,8 +61,8 @@ def login(driver: WebDriver, cred: Credential):
 
 
 def entry_campaigns(driver: WebDriver):
-    driver.get(
-        "https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml?l-id=enavi_all_glonavi_campaign")
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml"
+               "?l-id=enavi_all_glonavi_campaign")
     wait_random_time(4.0, 1.0, 2.0)
 
     campaign_ids = driver.find_element(
@@ -119,7 +119,8 @@ def entry_campaigns(driver: WebDriver):
 
 
 def entry_point_plus(driver: WebDriver):
-    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/shop-point/index.xhtml?l-id=enavi_oo_pointservice_xlo_sideguide")
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/shop-point/index.xhtml"
+               "?l-id=enavi_oo_pointservice_xlo_sideguide")
 
     wait_random_time(5.0, 2.0, 3.0)
 
@@ -287,7 +288,8 @@ def entry_pointcard_campaign(driver: WebDriver):
 
 def click_point(driver: WebDriver):
     # click point
-    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml?l-id=enavi_top_info-personal_click-point")
+    driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml"
+               "?l-id=enavi_top_info-personal_click-point")
     wait_random_time(3.0, 1.0, 1.0)
 
     try:
