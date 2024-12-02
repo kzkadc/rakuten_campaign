@@ -123,7 +123,8 @@ def entry_point_plus(driver: WebDriver):
 
     wait_random_time(5.0, 2.0, 3.0)
 
-    card_select = driver.find_element(By.ID, "cardChangeForm:cards")
+    card_select = driver.find_element(
+        By.CSS_SELECTOR, "#cardChangeForm select")
     card_select = Select(card_select)
     for card_index in range(len(card_select.options)):
         card_select.select_by_index(card_index)
