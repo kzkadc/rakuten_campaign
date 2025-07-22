@@ -75,8 +75,13 @@ def entry_campaigns(driver: WebDriver):
     campaign_ids = campaign_ids["items"]["campaign_status"]["ongoing"]["unregistered"]
     print("campaign_ids", campaign_ids)
 
+    shuffled_campaign_ids_it = (
+        campaign_ids[i]
+        for i in np.random.permutation(len(campaign_ids))
+    )
+
     # entry each campaign
-    for cid in campaign_ids:
+    for cid in shuffled_campaign_ids_it:
         print(cid)
 
         driver.get(
@@ -127,7 +132,10 @@ def entry_point_plus(driver: WebDriver):
     card_select = driver.find_element(
         By.CSS_SELECTOR, "#cardChangeForm select")
     card_select = Select(card_select)
-    for card_index in range(len(card_select.options)):
+
+    shuffled_card_idx_it = np.random.permutation(len(card_select.options))
+
+    for card_index in shuffled_card_idx_it:
         card_select.select_by_index(card_index)
         wait_random_time(5.0, 2.0, 3.0)
 
@@ -202,7 +210,12 @@ def entry_pay_campaign(driver: WebDriver):
     )
     BUTTON_SELECTOR = f":is({','.join(BUTTON_SELECTOR_PARENTS)}) a"
 
-    for cmp in campaign_info:
+    shuffled_campaign_it = (
+        campaign_info[i]
+        for i in np.random.permutation(len(campaign_info))
+    )
+
+    for cmp in shuffled_campaign_it:
         print(cmp["name"])
         if not cmp["need_to_entry"]:
             print("-- no need to entry")
@@ -264,7 +277,12 @@ def entry_pointcard_campaign(driver: WebDriver):
     )
     ENTRY_BUTTON_SELECTOR = f":is({','.join(ENTRY_BUTTON_PARENTS)}) a"
 
-    for name, state, url in campaign_info:
+    shuffled_campaign_it = (
+        campaign_info[i]
+        for i in np.random.permutation(len(campaign_info))
+    )
+
+    for name, state, url in shuffled_campaign_it:
         print(f"{name}, {state}, {url}")
         if any(w in state for w in ("エントリー不要", "エントリー済")):
             print("-- skip")
@@ -301,7 +319,12 @@ def click_point(driver: WebDriver):
 
     print(f"Number of banners: {len(banners)}")
 
-    for b in banners:
+    shuffled_banner_it = (
+        banners[i]
+        for i in np.random.permutation(len(banners))
+    )
+
+    for b in shuffled_banner_it:
         banner_img = b.find_element(
             By.CSS_SELECTOR, ".click-point-banner-image-wrap img")
         banner_alt = banner_img.get_attribute("alt")
