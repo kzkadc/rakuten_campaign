@@ -108,9 +108,9 @@ def entry_campaigns(driver: WebDriver):
             entry_button = find_element(
                 driver, By.CSS_SELECTOR, ENTRY_BUTTON_SELECTOR)
 
-        if entry_button is None:
-            print(
-                f"*****{cid} is not entried but not applied.*****")
+        if entry_button is None or "エントリー済" in entry_button.text:
+            print(f"*****{cid} is not entried but not applied,"
+                  " or have already entried.*****")
         else:
             try:
                 driver.execute_script(
@@ -227,8 +227,8 @@ def entry_pay_campaign(driver: WebDriver):
 
         button = find_element(driver, By.CSS_SELECTOR,
                               BUTTON_SELECTOR)
-        if button is None:
-            print("-- Could not find entry button")
+        if button is None or "エントリー済" in button.text:
+            print("-- Could not find entry button or have already entried")
             continue
 
         try:
@@ -292,14 +292,16 @@ def entry_pointcard_campaign(driver: WebDriver):
         wait_random_time(5.0, 2.0, 3.0)
         entry_button = find_element(driver, By.CSS_SELECTOR,
                                     ENTRY_BUTTON_SELECTOR)
-        if entry_button is not None:
+        if entry_button is not None \
+                and "エントリー済" not in entry_button.text:
+
             try:
                 driver.execute_script("arguments[0].click();", entry_button)
             except Exception as e:
                 print(f"-- could not click entry button: {e}")
             wait_random_time(5.0, 2.0, 3.0)
         else:
-            print("-- could not find entry button")
+            print("-- could not find entry button or have already entried")
 
         print()
 
