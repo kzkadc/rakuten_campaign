@@ -136,6 +136,10 @@ def entry_point_plus(driver: WebDriver):
     shuffled_card_idx_it = np.random.permutation(len(card_select.options))
 
     for card_index in shuffled_card_idx_it:
+        card_select = driver.find_element(
+            By.CSS_SELECTOR, "#cardChangeForm select")
+        card_select = Select(card_select)
+
         card_select.select_by_index(card_index)
         wait_random_time(5.0, 2.0, 3.0)
 
@@ -181,7 +185,12 @@ def entry_pay_campaign(driver: WebDriver):
         By.CSS_SELECTOR, ".rpay-cmp ul#js-cmp-view-list.r-cp-list a.active")
 
     campaign_info = []
-    for cmp in campaign_list:
+    for i in range(len(campaign_list)):
+        campaign_list = driver.find_elements(
+            By.CSS_SELECTOR, ".rpay-cmp ul#js-cmp-view-list.r-cp-list a.active")
+
+        cmp = campaign_list[i]
+
         name = find_element(cmp, By.CSS_SELECTOR,
                             ".r-cp-list-cont .r-cp-title")
         if name is None:
@@ -256,7 +265,11 @@ def entry_pointcard_campaign(driver: WebDriver):
     campaign_elems = driver.find_elements(
         By.CSS_SELECTOR, "li.Campaign__root.Campaign__show")
     campaign_info = []
-    for elem in campaign_elems:
+    for i in range(len(campaign_elems)):
+        campaign_elems = driver.find_elements(
+            By.CSS_SELECTOR, "li.Campaign__root.Campaign__show")
+        elem = campaign_elems[i]
+
         details = elem.find_element(By.CSS_SELECTOR, ".Campaign__details")
         name = details.find_element(By.CSS_SELECTOR, ".Campaign__title")
         name = name.text.strip()
