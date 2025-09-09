@@ -100,7 +100,8 @@ def entry_campaigns(driver: WebDriver):
                 ".rex-entry-button__enabled",
                 ".CampaignButton",
                 ".user-friendly-campaign-entry-form-entry-button-area",
-                ".applyBtnWrap"
+                ".applyBtnWrap",
+                ".rcEntryButton-button"
             )
             ENTRY_BUTTON_SELECTOR = f":is({','.join(
                 ENTRY_BUTTON_PARENTS)}) a"
