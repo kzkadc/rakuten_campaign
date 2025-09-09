@@ -328,7 +328,7 @@ def click_point(driver: WebDriver):
 
     try:
         banners = driver.find_elements(
-            By.CSS_SELECTOR, "ul.click-point-banner-list li.click-point-banner a")
+            By.CSS_SELECTOR, "#js-click-point-banner-list li a")
     except NoSuchElementException:
         print("No banners.")
         return
@@ -341,14 +341,7 @@ def click_point(driver: WebDriver):
     )
 
     for b in shuffled_banner_it:
-        banner_img = b.find_element(
-            By.CSS_SELECTOR, ".click-point-banner-image-wrap img")
-        banner_alt = banner_img.get_attribute("alt")
-        print(banner_alt)
-
-        clicked_status = b.find_element(
-            By.CSS_SELECTOR, ".click-point-banner-clicked-item")
-        if clicked_status.text.strip() == "済":
+        if "獲得済" in b.text:
             continue
 
         driver.execute_script("arguments[0].click();", b)
