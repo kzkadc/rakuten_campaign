@@ -39,6 +39,8 @@ def main():
 
     driver.quit()
 
+    print("Finished")
+
 
 def login(driver: WebDriver, cred: Credential):
     driver.get(
@@ -62,6 +64,8 @@ def login(driver: WebDriver, cred: Credential):
 
 
 def entry_campaigns(driver: WebDriver):
+    print("Campaigns")
+
     driver.get("https://www.rakuten-card.co.jp/e-navi/members/campaign/index.xhtml"
                "?l-id=enavi_all_glonavi_campaign")
     wait_random_time(4.0, 1.0, 2.0)
@@ -89,6 +93,16 @@ def entry_campaigns(driver: WebDriver):
             "https://www.rakuten-card.co.jp/e-navi/members/campaign/entry.xhtml?camc=" + cid)
         wait_random_time(5.0, 2.0, 3.0)
 
+        if any(
+            driver.current_url.startswith(url)
+            for url in (
+                "https://www.rakuten-card.co.jp/e-navi/members/point/shop-point",
+                "https://pay.rakuten.co.jp/campaign",
+                "https://pointcard.rakuten.co.jp/campaign"
+            )
+        ):
+            continue
+
         entry_button = None
         for button_id in ("entryForm:entry", "entryForm:entryTeam"):
             entry_button = find_element(driver, By.ID, button_id)
@@ -112,7 +126,7 @@ def entry_campaigns(driver: WebDriver):
 
         if entry_button is None or "エントリー済" in entry_button.text:
             print(f"*****{cid} is not entried but not applied,"
-                  " or have already entried.*****")
+                  " or has already been entried.*****")
         else:
             try:
                 driver.execute_script(
@@ -126,6 +140,8 @@ def entry_campaigns(driver: WebDriver):
 
 
 def entry_point_plus(driver: WebDriver):
+    print("Point Plus")
+
     driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/shop-point/index.xhtml"
                "?l-id=enavi_oo_pointservice_xlo_sideguide")
 
@@ -179,6 +195,8 @@ def entry_point_plus(driver: WebDriver):
 
 
 def entry_pay_campaign(driver: WebDriver):
+    print("Rakuten Pay Campaign")
+
     driver.get("https://pay.rakuten.co.jp/campaign/")
 
     wait_random_time(5.0, 2.0, 3.0)
@@ -239,7 +257,7 @@ def entry_pay_campaign(driver: WebDriver):
         button = find_element(driver, By.CSS_SELECTOR,
                               BUTTON_SELECTOR)
         if button is None or "エントリー済" in button.text:
-            print("-- Could not find entry button or have already entried")
+            print("-- Could not find entry button or has already been entried")
             continue
 
         try:
@@ -252,6 +270,8 @@ def entry_pay_campaign(driver: WebDriver):
 
 
 def entry_pointcard_campaign(driver: WebDriver):
+    print("Pointcard Campaign")
+
     driver.get("https://pointcard.rakuten.co.jp/campaign/")
 
     wait_random_time(5.0, 2.0, 3.0)
@@ -316,7 +336,7 @@ def entry_pointcard_campaign(driver: WebDriver):
                 print(f"-- could not click entry button: {e}")
             wait_random_time(5.0, 2.0, 3.0)
         else:
-            print("-- could not find entry button or have already entried")
+            print("-- could not find entry button or has already been entried")
 
         print()
 
@@ -352,6 +372,8 @@ def entry_fashion(driver: WebDriver):
 
 
 def click_point(driver: WebDriver):
+    print("Click point")
+
     # click point
     driver.get("https://www.rakuten-card.co.jp/e-navi/members/point/click-point/index.xhtml"
                "?l-id=enavi_top_info-personal_click-point")
