@@ -31,6 +31,7 @@ def main():
         entry_campaigns,
         entry_pointcard_campaign,
         entry_pay_campaign,
+        entry_fashion,
         click_point
     )
     for i in np.random.permutation(len(entry_functions)):
@@ -318,6 +319,36 @@ def entry_pointcard_campaign(driver: WebDriver):
             print("-- could not find entry button or have already entried")
 
         print()
+
+
+def entry_fashion(driver: WebDriver):
+    print("Fashion")
+
+    driver.get("https://brandavenue.rakuten.co.jp/contents/o2o-entry/spu/")
+    wait_random_time(3.0, 1.0, 1.0)
+
+    cards = driver.find_elements(
+        By.CSS_SELECTOR, ".o2o-entry-card-list .o2o-entry-card")
+    for i in range(len(cards)):
+        cards = driver.find_elements(
+            By.CSS_SELECTOR, ".o2o-entry-card-list .o2o-entry-card")
+        card = cards[i]
+
+        if "エントリー済み" in card.text:
+            continue
+
+        try:
+            link = card.find_element(
+                By.CSS_SELECTOR, "button.o2o-entry-card-info-action")
+            name = card.get_attribute("data-brandname")
+        except NoSuchElementException:
+            print("cannot entry")
+            continue
+
+        driver.execute_script("arguments[0].click();", link)
+        print(name)
+
+        wait_random_time(2.0, 1.0, 1.0)
 
 
 def click_point(driver: WebDriver):
