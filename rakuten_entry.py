@@ -30,7 +30,6 @@ def main():
         entry_point_plus,
         entry_campaigns,
         entry_pointcard_campaign,
-        entry_pay_campaign,
         entry_fashion,
         click_point
     )
@@ -194,81 +193,6 @@ def entry_point_plus(driver: WebDriver):
             wait_random_time(5.0, 2.0, 3.0)
 
 
-def entry_pay_campaign(driver: WebDriver):
-    print("Rakuten Pay Campaign")
-
-    driver.get("https://pay.rakuten.co.jp/campaign/")
-
-    wait_random_time(5.0, 2.0, 3.0)
-
-    campaign_list = driver.find_elements(
-        By.CSS_SELECTOR, ".rpay-cmp ul#js-cmp-view-list.r-cp-list a.active")
-
-    campaign_info = []
-    for i in range(len(campaign_list)):
-        campaign_list = driver.find_elements(
-            By.CSS_SELECTOR, ".rpay-cmp ul#js-cmp-view-list.r-cp-list a.active")
-
-        cmp = campaign_list[i]
-
-        name = find_element(cmp, By.CSS_SELECTOR,
-                            ".r-cp-list-cont .r-cp-title")
-        if name is None:
-            continue
-
-        name = name.text.strip()
-        url = cmp.get_attribute("href")
-        if url is None:
-            continue
-
-        url = url.strip()
-        need_to_entry = find_element(
-            cmp, By.CSS_SELECTOR, ".r-cp-bnr-icon-no-need-to-enter") is None
-        campaign_info.append({
-            "name": name,
-            "url": url,
-            "need_to_entry": need_to_entry
-        })
-
-    wait_random_time(5.0, 2.0, 3.0)
-
-    BUTTON_SELECTOR_PARENTS = (
-        "div.CampaignButton",
-        "div.user-friendly-campaign-entry-form-entry-button-area",
-        "div.rex-entry-button__enabled"
-    )
-    BUTTON_SELECTOR = f":is({','.join(BUTTON_SELECTOR_PARENTS)}) a"
-
-    shuffled_campaign_it = (
-        campaign_info[i]
-        for i in np.random.permutation(len(campaign_info))
-    )
-
-    for cmp in shuffled_campaign_it:
-        print(cmp["name"])
-        if not cmp["need_to_entry"]:
-            print("-- no need to entry")
-            continue
-
-        driver.get(cmp["url"])
-
-        wait_random_time(5.0, 2.0, 3.0)
-
-        button = find_element(driver, By.CSS_SELECTOR,
-                              BUTTON_SELECTOR)
-        if button is None or "エントリー済" in button.text:
-            print("-- Could not find entry button or has already been entried")
-            continue
-
-        try:
-            driver.execute_script("arguments[0].click();", button)
-        except Exception as e:
-            print(f"-- Could not entry: {e}")
-            continue
-
-        wait_random_time(5.0, 2.0, 3.0)
-
-
 def entry_pointcard_campaign(driver: WebDriver):
     print("Pointcard Campaign")
 
@@ -276,34 +200,52 @@ def entry_pointcard_campaign(driver: WebDriver):
 
     wait_random_time(5.0, 2.0, 3.0)
 
-    SCROLL_STEPS = 4
-    for i in range(1, SCROLL_STEPS + 1):
-        driver.execute_script(
-            f"window.scrollTo(0, document.body.scrollHeight*{i}/{SCROLL_STEPS});")
-        wait_random_time(2.0, 1.0, 1.0)
+    def get_campaigns() -> list[dict[str, str]]:
+        """
+        returns: [{"url": "https://...", "name": "campaign name"}, ...]
+        """
 
-    wait_random_time(5.0, 2.0, 3.0)
+        nonlocal driver
 
-    campaign_elems = driver.find_elements(
-        By.CSS_SELECTOR, "li.Campaign__root.Campaign__show")
-    campaign_info = []
-    for i in range(len(campaign_elems)):
-        campaign_elems = driver.find_elements(
-            By.CSS_SELECTOR, "li.Campaign__root.Campaign__show")
-        elem = campaign_elems[i]
+        campaigns = []
 
-        details = elem.find_element(By.CSS_SELECTOR, ".Campaign__details")
-        name = details.find_element(By.CSS_SELECTOR, ".Campaign__title")
-        name = name.text.strip()
+        cards = driver.find_elements(
+            By.CSS_SELECTOR,
+            "article.medias-grid a.card"
+        )
 
-        state = details.find_element(
-            By.CSS_SELECTOR, ".Badges__root")
-        state = state.text.strip()
+        for card in cards:
+            # カード内のラベルを取得
+            labels = card.find_elements(
+                By.CSS_SELECTOR,
+                ".card__labels .label"
+            )
 
-        url = elem.find_element(By.CSS_SELECTOR, "a.Campaign__contents") \
-            .get_attribute("href")
+            label_texts = {label.text.strip() for label in labels}
 
-        campaign_info.append((name, state, url))
+            # 対象のキャンペーンだけ抽出
+            if not label_texts.intersection({"未エントリー", "ページで確認"}):
+                continue
+
+            url = card.get_attribute("href")
+
+            title = card.find_element(
+                By.CSS_SELECTOR,
+                ".card__title"
+            ).text.strip()
+
+            campaigns.append({
+                "url": url,
+                "name": title,
+            })
+
+        return campaigns
+
+    campaign_info = get_campaigns()
+    shuffled_campaign_it = (
+        campaign_info[i]
+        for i in np.random.permutation(len(campaign_info))
+    )
 
     ENTRY_BUTTON_PARENTS = (
         ".rex-entry-button__enabled",
@@ -312,16 +254,11 @@ def entry_pointcard_campaign(driver: WebDriver):
     )
     ENTRY_BUTTON_SELECTOR = f":is({','.join(ENTRY_BUTTON_PARENTS)}) a"
 
-    shuffled_campaign_it = (
-        campaign_info[i]
-        for i in np.random.permutation(len(campaign_info))
-    )
+    for camp_dict in shuffled_campaign_it:
+        name = camp_dict["name"]
+        url = camp_dict["url"]
 
-    for name, state, url in shuffled_campaign_it:
-        print(f"{name}, {state}, {url}")
-        if any(w in state for w in ("エントリー不要", "エントリー済")):
-            print("-- skip")
-            continue
+        print(f"{name}, {url}")
 
         driver.get(url)
         wait_random_time(5.0, 2.0, 3.0)
@@ -349,7 +286,8 @@ def entry_fashion(driver: WebDriver):
 
     cards = driver.find_elements(
         By.CSS_SELECTOR, ".o2o-entry-card-list .o2o-entry-card")
-    for i in range(len(cards)):
+    card_order = np.random.permutation(len(cards))
+    for i in card_order:
         cards = driver.find_elements(
             By.CSS_SELECTOR, ".o2o-entry-card-list .o2o-entry-card")
         card = cards[i]
